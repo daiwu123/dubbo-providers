@@ -37,6 +37,7 @@ public class DbTest {
         System.out.println("测试git提交的112ss");
         System.out.println("测试git提交的");
         jedisUtils.delKey("dada");
+        System.out.println("dasdada");
     }
 
 }
