@@ -36,7 +36,7 @@ public class DbTest {
     public void deleteRedisTest(){
         System.out.println("删除了无用的输出");
         jedisUtils.delKey("dada");
-        System.out.println("dasdada");
+        System.out.println("dasdadaasddsa");
     }
 
 }
