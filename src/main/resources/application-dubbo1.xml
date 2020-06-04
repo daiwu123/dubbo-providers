@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                          http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://dubbo.apache.org/schema/dubbo
+                          http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+    <!--属性解释请查看官网-->
+    <!-- http://dubbo.apache.org/zh-cn/docs/user/references/xml/dubbo-protocol.html-->
+    <!--用于配置当前应用信息，不管该应用是提供者还是消费者 -->
+    <dubbo:application name="providers-1"/>
+    <!-- 用于配置连接注册中心相关信息  127.0.0.1:2182,127.0.0.1:2183-->
+    <!--<dubbo:registry address="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183" protocol="zookeeper" dynamic="true"/>-->
+    <!-- 用于配置提供服务的协议信息，协议由提供方指定，消费方被动接受 -->
+    <!--<dubbo:protocol name="dubbo" port="20883"/>-->
+
+    <!--  <dubbo:protocol name="rmi" port="20884" />-->
+    <!--dubbo扫描-->
+    <dubbo:annotation package="com.pro.service.impl"/>
+    <dubbo:annotation package="com.pro.dubboservice"/>
+
+    <dubbo:config-center  protocol="zookeeper"  address="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183"  />
+    <!--<dubbo:metadata-report />-->
+    <!--用于暴露一个服务，定义服务的元信息，一个服务可以用多个协议暴露，一个服务也可以注册到多个注册中心 -->
+    <!--每个接口都应定义版本号，为后续不兼容升级提供可能 -->
+    <!--ref：服务的真正实现类 -->
+    <!--<dubbo:service interface="com.s.service.IPopService" ref="popServiceImpl"  />-->
+   <!-- <dubbo:config-center protocol="zookeeper" address="127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183"></dubbo:config-center>-->
+    <!--<dubbo:config-center></dubbo:config-center>-->
+</beans>

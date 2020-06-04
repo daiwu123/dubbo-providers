@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                          http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://www.springframework.org/schema/tx
+                          http://www.springframework.org/schema/tx/spring-tx.xsd
+                          http://www.springframework.org/schema/context
+                          http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--将配置文件中的值解析为KV键值对-->
+    <!-- <bean id="propertyConfig" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer" >
+        <property name="location" value="classpath:properties/jdbc.properties"></property>
+         <property name="fileEncoding" value="utf-8"></property>
+    </bean>-->
+   <import resource="classpath:application-dubbo1.xml"/>
+    <!--组件扫描注解-->
+    <!--<context:component-scan base-package="com.pro.sql.mapper"/>-->
+   <context:component-scan base-package="com.pro.service.impl"/>
+    <context:component-scan base-package="com.pro.config"/>
+    <context:component-scan base-package="com.pro.rocketmq"/>
+  <!--  <context:component-scan base-package="com.pro.service"></context:component-scan>-->
+    <!--配置文件解析成 KV键值对-->
+    <context:property-placeholder file-encoding="utf-8" ignore-unresolvable="true" location="classpath:properties/jdbc.properties"></context:property-placeholder>
+    <context:property-placeholder file-encoding="utf-8" ignore-unresolvable="true" location="classpath:properties/redis.properties"></context:property-placeholder>
+    <!--配置mysql连接池数据源   DruidAbstractDataSource 配置参数-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.pass}"></property>
+        <property name="maxActive" value="${jdbc.maxActive}"></property>
+        <property name="maxWait" value="${jdbc.maxWait}"></property>
+        <property name="minIdle" value="${jdbc.minIdle}"></property>
+        <property name="initialSize" value="${jdbc.initialSize}"></property>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}"></property>
+        <property name="testWhileIdle" value="${jdbc.testWhileIdle}"></property>
+    </bean>
+
+    <!--整合spring mybaties-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--设置数据库连接池-->
+        <property name="dataSource" ref="dataSource"></property>
+        <!--配置映射文件路径-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+        <!--配置mybatis 全局配置文件-->
+        <property name="configLocation" value="classpath:spring-mybaties.xml"></property>
+        <!--扫描包 xml中parameterType就可以使用类名，不用全路径-->
+        <property name="typeAliasesPackage" value="com.pro.sql.model"></property>
+    </bean>
+    <!--接口类文件和xml文件映射-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.pro.sql.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+    <!--配置事务管理器-->
+    <bean  id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--配置注解驱动事务管理器对象-->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"></tx:annotation-driven>
+
+    <!--配置redis-->
+    <!-- redis数据源 -->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最大空闲数 -->
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <!-- 最大空连接数 -->
+        <property name="maxTotal" value="${redis.maxTotal}" />
+        <!-- 最大等待时间 -->
+        <property name="maxWaitMillis" value="${redis.maxWaitMillis}" />
+        <!-- 返回连接时，检测连接是否成功 -->
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean>
+    <bean id="redisPass" class="org.springframework.data.redis.connection.RedisPassword">
+        <constructor-arg name="thePassword" value="${redis.password}"></constructor-arg>
+    </bean>
+    <bean id="redisStandaloneConfiguration" class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+        <property name="hostName" value="${redis.host}"></property>
+        <property name="password" ref="redisPass"></property>
+        <property name="port" value="${redis.port}"></property>
+        <property name="database" value="${redis.databaseIndex}"></property>
+    </bean>
+    <bean id="clientConfig" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory.MutableJedisClientConfiguration">
+        <property name="poolConfig" ref="poolConfig"></property>
+    </bean>
+    <!-- Spring-redis连接池管理工厂 -->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg name="standaloneConfig" ref="redisStandaloneConfiguration"></constructor-arg>
+        <constructor-arg name="clientConfig" ref="clientConfig"></constructor-arg>
+        <!-- IP地址 -->
+        <!-- <property name="hostName" value="${redis.host}" />-->
+        <!-- 端口号 -->
+        <!--  <property name="port" value="${redis.port}" />
+          <property name="password" value="${redis.password}" />-->
+        <!-- 超时时间 默认2000-->
+        <!--  <property name="timeout" value="${redis.timeout}" />-->
+        <!-- 连接池配置引用 -->
+        <!--<property name="poolConfig" ref="poolConfig" />-->
+        <!-- usePool：是否使用连接池 -->
+        <!-- <property name="usePool" value="true"/>-->
+    </bean>
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory" />
+        <!--keySerializer 键的序列化器用什么 StringRedisSerializer 字符串 JdkSerializationRedisSerializer二进制 -->
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </property>
+        <property name="hashKeySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </property>
+        <property name="hashValueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </property>
+        <!--开启事务  -->
+        <property name="enableTransactionSupport" value="true"></property>
+    </bean>
+
+    <bean class="com.pro.redis.JedisUtils">
+        <property name="redisTemplate" ref="redisTemplate"></property>
+    </bean>
+</beans>
