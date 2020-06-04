@@ -34,8 +34,7 @@ public class DbTest {
 
     @Test
     public void deleteRedisTest(){
-        System.out.println("测试git提交的112ss");
-        System.out.println("测试git提交的");
+        System.out.println("删除了无用的输出");
         jedisUtils.delKey("dada");
         System.out.println("dasdada");
     }
