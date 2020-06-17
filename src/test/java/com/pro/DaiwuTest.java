@@ -12,6 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DaiwuTest {
     @Test
     public void test1(){
-        System.out.println("测试一次性");
+        System.out.println("测试一次性的");
     }
 }
