@@ -2,6 +2,7 @@ package com.pro.redis;
 
 import org.springframework.data.redis.core.RedisTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 public class JedisUtils {
@@ -10,6 +11,12 @@ public class JedisUtils {
     public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
+
+    @PostConstruct
+    public void init(){
+        System.out.println("jedisutil init");
+    }
+
 
     public  boolean setString(String key,String value){
         try {
