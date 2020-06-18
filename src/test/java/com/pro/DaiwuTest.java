@@ -14,4 +14,9 @@ public class DaiwuTest {
     public void test1(){
         System.out.println("测试一次性的");
     }
+
+    @Test
+    public void test2(){
+        System.out.println("daiwu测试的文件");
+    }
 }
