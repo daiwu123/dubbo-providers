@@ -13,6 +13,7 @@ public class DaiwuTest {
     @Test
     public void test1(){
         System.out.println("测试一次性的33333333糖糖修改");
+        System.out.println("测试一次性的33333333daiwu修改");
     }
 
     @Test
