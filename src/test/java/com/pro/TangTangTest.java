@@ -12,5 +12,6 @@ public class TangTangTest {
     public void test1(){
         System.out.println("糖糖的测试开始了..");
         System.out.println("戴武新加的逻辑");
+        System.out.println("糖糖新加的逻辑");
     }
 }
